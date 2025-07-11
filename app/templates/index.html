@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GitHub Webhook Events</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    h2 { color: #333; }
+    .event { margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; background: #fff; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Latest GitHub Webhook Events</h2>
+  <div id="events"></div>
+
+  <script>
+    function fetchEvents() {
+      fetch('/webhook/events')
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('events');
+          container.innerHTML = '';
+          data.forEach(event => {
+            let msg = '';
+            const time = new Date(event.timestamp).toUTCString();  // Shows UTC/GMT
+
+            //const time = new Date(event.timestamp).toLocaleString();  // Shows browser's local time
+            if (event.action === "PUSH") {
+              msg = `${event.author} pushed to ${event.to_branch} on ${time}`;
+            } else if (event.action === "PULL_REQUEST") {
+              msg = `${event.author} submitted a pull request from ${event.from_branch} to ${event.to_branch} on ${time}`;
+            } else if (event.action === "MERGE") {
+              msg = `${event.author} merged branch ${event.from_branch} to ${event.to_branch} on ${time}`;
+            }
+            const div = document.createElement('div');
+            div.className = 'event';
+            div.textContent = msg;
+            container.appendChild(div);
+          });
+        });
+    }
+
+    fetchEvents();                // Initial load
+    setInterval(fetchEvents, 15000); // Refresh every 15 seconds
+  </script>
+</body>
+</html>
