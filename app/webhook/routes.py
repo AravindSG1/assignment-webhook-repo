@@ -1,8 +1,7 @@
 # app/webhook/routes.py
 from flask import Blueprint, request, jsonify
 from app.extensions import mongo
-from datetime import datetime, timezone
-import pytz
+from datetime import datetime, timezone, timedelta
 from flask import render_template
 
 webhook = Blueprint('Webhook', __name__, url_prefix='/webhook')
@@ -34,7 +33,7 @@ def receiver():
         to_branch = pr["base"]["ref"]
         author = pr["user"]["login"]
 
-        # Handle MERGE (bonus)
+        # Handle MERGE
         if pr.get("merged"):
             action_type = "MERGE"
 
@@ -54,8 +53,13 @@ def receiver():
 
 @webhook.route('/events', methods=["GET"])
 def get_events():
-    # Fetch the last 20 events (latest first)
-    events = mongo.db.webhook_events.find().sort("timestamp", -1).limit(20)
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(seconds=15)  # only recent events from last 15s
+
+    events = mongo.db.webhook_events.find({
+        "timestamp": {"$gte": cutoff.isoformat()}
+    }).sort("timestamp", -1)
+
     result = []
     for e in events:
         result.append({
@@ -65,6 +69,7 @@ def get_events():
             "to_branch": e.get("to_branch"),
             "timestamp": e.get("timestamp")
         })
+
     return jsonify(result), 200
 
 
