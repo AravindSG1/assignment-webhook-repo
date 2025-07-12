@@ -1,6 +1,6 @@
 # 📡 Webhook Receiver – Flask App
 
-This repository contains the backend application for receiving and processing GitHub webhook events like **push**, **pull request**, and (optionally) **merge** actions. It is designed to integrate with a companion repo (e.g., [`action-repo`](https://github.com/your-username/action-repo)) that triggers GitHub webhooks.
+This repository contains the backend application for receiving and processing GitHub webhook events like **push**, **pull request**, and **merge** actions. It is designed to integrate with a companion repo (e.g., [`action-repo`](https://github.com/AravindSG1/assignment-action-repo)) that triggers GitHub webhooks.
 
 ---
 
